@@ -26,7 +26,7 @@ const App: React.FC = () => {
   useEffect(() => {
     // Listener para receber mensagens do app React Native
     const handleMessage = (event: MessageEvent) => {
-      setResponse(`Response from app: ${event.data}`);
+      setResponse(`Response from app: ${JSON.stringify(event.data)}`);
     };
 
     window.addEventListener("message", handleMessage);
