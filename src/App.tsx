@@ -1,42 +1,50 @@
-import React, { useState } from 'react';
-import { Camera, CameraResultType } from '@capacitor/camera';
-import { Storage } from '@capacitor/storage';
+import React, { useEffect, useState } from 'react';
 
 const App: React.FC = () => {
-  const [photo, setPhoto] = useState<string | null>(null);
-  const [message, setMessage] = useState<string>('');
+  const [response, setResponse] = useState<string>('');
 
-  const takePicture = async () => {
-    const image = await Camera.getPhoto({
-      quality: 90,
-      allowEditing: false,
-      resultType: CameraResultType.Base64,
-    });
-    setPhoto(`data:image/jpeg;base64,${image.base64String}`);
+  // Função para abrir a câmera
+  const openCamera = () => {
+    sendMessageToNativeApp("openCamera");
   };
 
-  const saveMessage = async () => {
-    await Storage.set({
-      key: 'user-message',
-      value: message,
-    });
-    alert('Message saved!');
+  // Função para obter a localização
+  const getLocation = () => {
+    sendMessageToNativeApp("getLocation");
   };
+
+  // Função para mostrar um toast
+  const showToast = () => {
+    sendMessageToNativeApp("showToast");
+  };
+
+  // Função para enviar uma mensagem ao aplicativo React Native
+  const sendMessageToNativeApp = (message: string) => {
+    window.ReactNativeWebView?.postMessage(message);
+  };
+
+  useEffect(() => {
+    // Listener para receber mensagens do app React Native
+    const handleMessage = (event: MessageEvent) => {
+      setResponse(`Response from app: ${event.data}`);
+    };
+
+    window.addEventListener("message", handleMessage);
+
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, []);
 
   return (
-    <div style={{ textAlign: 'center', padding: '20px' }}>
-      <h1>Web App with Capacitor Plugins</h1>
-      <button onClick={takePicture}>Take Picture</button>
-      {photo && <img src={photo} alt="" style={{ width: '100%', maxWidth: '300px' }} />}
-      <div>
-        <input
-          type="text"
-          placeholder="Enter message"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-        />
-        <button onClick={saveMessage}>Save Message</button>
-      </div>
+    <div style={{ textAlign: 'center', marginTop: '20px' }}>
+      <h1>React Native WebView Example</h1>
+      
+      <button onClick={openCamera}>Open Camera</button>
+      <button onClick={getLocation}>Get Location</button>
+      <button onClick={showToast}>Show Toast</button>
+
+      <p>{response}</p>
     </div>
   );
 };
