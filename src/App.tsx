@@ -38,6 +38,7 @@ const App: React.FC = () => {
 
   return (
     <div style={{ textAlign: 'center', marginTop: '20px' }}>
+      <button onClick={() => {window.location.href = "testapp://aquitop?code=12345"}}>Teste</button>
       <h1>React Native WebView Example</h1>
       
       <button onClick={openCamera}>Open Camera</button>
